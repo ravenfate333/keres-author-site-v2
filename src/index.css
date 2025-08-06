@@ -1,3 +1,15 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+    html {
+      @apply overflow-y-scroll;
+      scrollbar-gutter: stable;
+    }
+    
+    body {
+      @apply bg-black bg-fixed bg-cover;
+      background-image: url('/Background.webp');
+    }
+  }

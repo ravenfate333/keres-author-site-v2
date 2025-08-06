@@ -1,69 +1,17 @@
-# React + TypeScript + Vite
+# Keres Author Site (v2)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This is a complete rewrite of my original author website built in 2023, rebuilt from the ground up with a modern, professional tech stack.
 
-Currently, two official plugins are available:
+The original v1 site can be viewed in its archived repository: https://github.com/ravenfate333/keres-author-site
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Tech Stack
 
-## Expanding the ESLint configuration
+- **Framework:** React (with Vite)
+- **Language:** TypeScript
+- **Styling:** Tailwind CSS
+- **Content:** Sanity.io (Headless CMS)
+- **Deployment:** Vercel or Netlify (Late 2025 upon current web hosting expiry)
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## Technical Decisions
 
-```js
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      ...tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      ...tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      ...tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
-
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+A key decision in this project was to use **Tailwind CSS v3**. While v4 is available, I chose v3 for its stability, extensive community support, and robust ecosystem. This ensures maximum browser compatibility for my audience while still utilizing a modern, utility-first CSS workflow.
