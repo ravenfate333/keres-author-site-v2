@@ -1,4 +1,4 @@
-// This file defines shared TypeScript interfaces for the application's data structures.
+// This file defines shared TypeScript interfaces for the application's data structures
 export interface RgbaColor {
     r: number;
     g: number;
@@ -9,6 +9,9 @@ export interface RgbaColor {
   export interface Book {
     _id: string;
     title: string;
+    slug?: {
+      current: string;
+    };
     bookNumber?: number;
     bookNumberLabel?: string;
     coverImage: {

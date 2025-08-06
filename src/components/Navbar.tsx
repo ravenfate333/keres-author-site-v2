@@ -12,6 +12,7 @@ const navLinks = [
 ];
 
 const bookLinks = [
+  { href: '/books', label: 'All Books' },
   { href: '/series/cracked-coffins-series', label: 'The Cracked Coffins Series' },
 ];
 
