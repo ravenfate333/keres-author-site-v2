@@ -1,6 +1,7 @@
 // This file defines a 'book' schema for Sanity.io for unique book objects to be created by the author/user. 
 
 import { defineField, defineType } from 'sanity'
+import InheritedGenres from '../inputs/InheritedGenres'
 
 export default defineType({
     name: 'book',
@@ -51,6 +52,22 @@ export default defineType({
             title: 'Series',
             type: 'reference',
             to: { type: 'series' }, // This links it to the 'series' type
+        }),
+        defineField({
+            name: 'inheritedGenres',
+            title: 'Inherited Genres',
+            type: 'string', // The type doesn't matter, it's just for display
+            components: {
+                field: InheritedGenres, // Tell Sanity to use React component for this field
+            },
+            hidden: ({ document }) => !document?.series, // Only show this if a series is selected!
+        }),
+        defineField({
+            name: 'genres',
+            title: 'Genres',
+            description: "Add any book-specific genres here. Main series genres are added automatically, so you don't need to add them again.",
+            type: 'array',
+            of: [{ type: 'reference', to: { type: 'genre' } }] // Array of genres
         }),
         defineField({
             name: 'coverImage',

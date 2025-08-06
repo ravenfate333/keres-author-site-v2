@@ -13,6 +13,13 @@ export default defineType({
       type: 'string',
     }),
     defineField({
+      name: 'genres',
+      title: 'Series Genres',
+      description: 'The main genres that apply to the entire series.',
+      type: 'array',
+      of: [{type: 'reference', to: {type: 'genre'}}]
+    }),
+    defineField({
       name: 'slug',
       title: 'URL Slug',
       description: 'A unique, URL-friendly version of the title (e.g., cracked-coffins). Click "Generate".',

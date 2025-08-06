@@ -8,17 +8,23 @@ const BookPage = () => {
   const { slug } = useParams(); // Get the book's slug from the URL
   const [book, setBook] = useState<Book | null>(null);
 
-  useEffect(() => {
-    if (!slug) return;
+useEffect(() => {
+  if (!slug) return;
 
-    // This query finds the single book that matches the slug in the URL
-    const query = `*[_type == "book" && slug.current == $slug][0]`;
-    const params = { slug };
+  const query = `*[_type == "book" && slug.current == $slug][0]{
+      ..., // "..." translation: "give me all the existing book fields"
+      // Combined list of genres
+      "genres": (
+          // "coalesce" prevents errors if a field doesn't exist
+          coalesce(genres[]->, []) + coalesce(series->genres[]->, [])
+      )
+  }`;
+  const params = { slug };
 
-    sanityClient.fetch(query, params)
-      .then((data) => setBook(data))
-      .catch(console.error);
-  }, [slug]);
+  sanityClient.fetch(query, params)
+    .then((data) => setBook(data))
+    .catch(console.error);
+}, [slug]);
 
   return (
     <div className="max-w-6xl mx-auto p-4 md:p-8">
