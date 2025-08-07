@@ -31,3 +31,13 @@ export interface RgbaColor {
     };
     genreIds?: string[]; 
   }
+
+  export interface Author {
+    title: string;
+    authorImage: {
+      asset: {
+        url: string;
+      };
+    }
+
+  }

@@ -9,7 +9,7 @@ import Layout from './components/Layout';
 import HomePage from './pages/HomePage';
 import SeriesPage from './pages/SeriesPage';
 import BookPage from './pages/BookPage';
-import AboutPage from './pages/AboutPage';
+import AuthorPage from './pages/AuthorPage';
 import AllBooksPage from './pages/AllBooksPage';
 // import ContactPage from './pages/ContactPage';
 
@@ -22,7 +22,7 @@ const router = createBrowserRouter([
       { index: true, element: <HomePage /> },
       { path: 'series/:slug', element: <SeriesPage /> },
       { path: 'books/:slug', element: <BookPage /> },
-      { path: 'about', element: <AboutPage /> },
+      { path: 'about', element: <AuthorPage /> },
       { path: 'books', element: <AllBooksPage /> },
       // { path: 'contact', element: <ContactPage /> },
       
