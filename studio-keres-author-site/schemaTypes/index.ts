@@ -2,5 +2,6 @@
 import book from './book'
 import series from './series'
 import genre from './genre'
+import settings from './settings'
 
-export const schemaTypes = [book, series, genre]
+export const schemaTypes = [book, series, genre, settings]

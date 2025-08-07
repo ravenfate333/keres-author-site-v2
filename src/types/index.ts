@@ -29,4 +29,5 @@ export interface RgbaColor {
       hex: string;
       rgb: RgbaColor;
     };
+    genreIds?: string[]; 
   }
