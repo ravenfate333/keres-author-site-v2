@@ -1,25 +1,42 @@
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faAmazon, faTiktok, faInstagram, faFacebook, faGoodreads } from "@fortawesome/free-brands-svg-icons";
+import { PLATFORMS } from '../../shared/platforms';
+import { useSocialLinks } from '../hooks/useSocialLinks';
 
-const socialLinks = [
-  { icon: faAmazon, href: "https://amazon.com/author/beronikakeres" },
-  { icon: faTiktok, href: "https://tiktok.com/@beronikakeres" },
-  { icon: faInstagram, href: "https://instagram.com/beronikakeres" },
-  { icon: faFacebook, href: "https://facebook.com/AuthorBeronikaKeres" },
-  { icon: faGoodreads, href: "https://www.goodreads.com/author/show/20537997.Beronika_Keres" }
-];
+interface SocialLinksProps {
+  size?: number;
+  gap?: string;
+  mode?: 'mono' | 'brand';
+}
 
-const SocialLinks = () => {
+export default function SocialLinks({ size = 24, gap = 'gap-3', mode = 'mono' }: SocialLinksProps) {
+  const links = useSocialLinks();
+
   return (
-    // Replaces .social-links from footer.scss
-    <div className="flex items-center justify-center gap-4 text-2xl">
-      {socialLinks.map((link) => (
-        <a key={link.href} href={link.href} target="_blank" rel="noopener noreferrer" className="text-white hover:text-gray-400 transition-colors">
-          <FontAwesomeIcon icon={link.icon} />
-        </a>
-      ))}
+    <div className={`flex ${gap}`}>
+      {links.filter(l => l.enabled !== false).map((link, i) => {
+        const platformData =
+          PLATFORMS.find(p => p.id === link.platform) || PLATFORMS.find(p => p.id === 'custom');
+        if (!platformData) return null;
+
+        const Icon = platformData.Icon;
+        const colorClass =
+          mode === 'brand' && platformData.brandColor ? '' : 'text-gray-500 hover:text-gray-900';
+        const inlineColor =
+          mode === 'brand' && platformData.brandColor ? { color: platformData.brandColor } : undefined;
+
+        return (
+          <a
+            key={i}
+            href={link.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label={link.ariaLabel || `Visit ${platformData.label} (opens in new tab)`}
+            className={colorClass}
+            style={inlineColor}
+          >
+            <Icon size={size} />
+          </a>
+        );
+      })}
     </div>
   );
-};
-
-export default SocialLinks;
+}

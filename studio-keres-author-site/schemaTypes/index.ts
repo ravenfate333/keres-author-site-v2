@@ -5,6 +5,7 @@ import genre from './genre'
 import navigation from './navigation'
 import author from './author'
 import settings from './settings'
+import links from './socialLinks'
 
 
-export const schemaTypes = [book, series, genre, navigation, author, settings]
+export const schemaTypes = [book, series, genre, navigation, author, settings, links]

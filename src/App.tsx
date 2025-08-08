@@ -8,6 +8,7 @@ function App() {
     <div className="flex flex-col h-screen justify-between bg-gray-800">
       <h1 className="text-white text-center text-3xl p-8">
         My New Website
+        
       </h1>
 
       <Footer />

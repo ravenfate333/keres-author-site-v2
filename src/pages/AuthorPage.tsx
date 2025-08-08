@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import sanityClient, { urlFor } from '../sanityClient';
 import { PortableText } from '@portabletext/react';
 import { customPortableTextComponents } from '../utils/portableTextComponents';
+import SocialLinks from '../components/SocialLinks';
 
 interface AuthorData {
   author: string;
@@ -61,6 +62,8 @@ const AuthorPage = () => {
         <div className="text-lg space-y-4">
           <PortableText value={author.bio} components={customPortableTextComponents} />
         </div>
+
+        <div className=''><SocialLinks /></div>
       </div>
     </div>
   );
