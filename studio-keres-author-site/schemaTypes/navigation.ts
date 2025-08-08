@@ -1,4 +1,4 @@
-import {defineField, defineType} from 'sanity'
+import { defineType, defineField, defineArrayMember } from 'sanity';
 
 export default defineType({
   name: 'navigation',
@@ -8,26 +8,41 @@ export default defineType({
     defineField({
       name: 'storeLink',
       title: 'Store Link',
-      description: 'Add a URL here to make the "Store" link appear in the main navigation. Leave it blank to hide it.',
+      description:
+        'Add a URL here to make the "Store" link appear in the main navigation. Leave it blank to hide it.',
       type: 'object',
       fields: [
-        defineField({ name: 'label', title: 'Label', type: 'string', initialValue: 'Store' }),
-        defineField({ name: 'url', title: 'URL', type: 'url' }),
-      ]
+        defineField({
+          name: 'label',
+          title: 'Label',
+          type: 'string',
+          initialValue: 'Store',
+        }),
+        defineField({
+          name: 'url',
+          title: 'URL',
+          type: 'url',
+        }),
+      ],
     }),
+
     defineField({
-        name: 'moreLinks',
-        title: '"More" Dropdown Links',
-        description: 'Add any extra links you want to appear in a "More" dropdown menu. The dropdown will not appear if this list is empty.',
-        type: 'array',
-        of: [{
-          type: 'object',
+      name: 'moreLinks',
+      title: '"More" Dropdown Links',
+      description:
+        'Add any extra links you want to appear in a "More" dropdown menu. The dropdown will not appear if this list is empty.',
+      type: 'array',
+      of: [
+        defineArrayMember({
           name: 'customLink',
+          title: 'Custom Link',
+          type: 'object',
           fields: [
             defineField({ name: 'label', title: 'Label', type: 'string' }),
             defineField({ name: 'url', title: 'URL', type: 'url' }),
-          ]
-        }]
-      }),
+          ],
+        }),
+      ],
+    }),
   ],
-})
+});

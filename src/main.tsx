@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import 'flowbite';
 
 import './index.css'; // Tailwind styles
 
@@ -13,7 +14,6 @@ import AuthorPage from './pages/AuthorPage';
 import AllBooksPage from './pages/AllBooksPage';
 // import ContactPage from './pages/ContactPage';
 
-
 const router = createBrowserRouter([
   {
     path: '/',
@@ -25,7 +25,6 @@ const router = createBrowserRouter([
       { path: 'about', element: <AuthorPage /> },
       { path: 'books', element: <AllBooksPage /> },
       // { path: 'contact', element: <ContactPage /> },
-      
     ],
   },
 ]);
