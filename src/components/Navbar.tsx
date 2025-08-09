@@ -2,12 +2,12 @@ import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import sanityClient from '../sanityClient';
 
-// TODO FIX STORE SHOWING UP UNDER MORE DROP DOWN
-// Two ideas: Rename more to Shop and allow multiple shop links + "duplicate" for true more
-// OR undo nesting  
-
+// -----------------------------
+// Types
+// -----------------------------
 interface NavSettings {
   storeLink?: { label: string; url: string };
+  shopLinks?: { label: string; url: string }[];
   moreLinks?: { label: string; url: string }[];
 }
 interface BookLinkItem {
@@ -16,35 +16,69 @@ interface BookLinkItem {
   slug: string;
 }
 
+// -----------------------------
+// Helpers
+// -----------------------------
 const isExternal = (url: string) => /^https?:\/\//i.test(url);
 
+// One class to rule them all (top-level items)
+const navLinkBase =
+  'inline-flex items-center h-12 px-4 text-sm font-medium text-nav hover:text-navHover rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-navAccent/50 motion-soft';
+
+// Small chevron beside dropdown triggers (animate rotation softly)
+const chevronClass = 'ml-1 w-4 h-4 opacity-80 motion-safe:transition motion-reduce:transition-none';
+
+// Desktop dropdown panel (fade in softly)
+const panelClass =
+  'absolute left-0 top-full z-20 mt-2 min-w-[16rem] rounded-lg bg-nav-bg/95 text-navHover p-1 shadow-lg backdrop-blur border-0 motion-fade-in';
+
+// Desktop dropdown item
+const itemClass =
+  'block rounded px-4 py-2 text-sm text-nav hover:text-navHover hover:bg-white/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-navAccent/40';
+
+// -----------------------------
+// Component
+// -----------------------------
 export default function Navbar() {
+  // ---- state/hooks (top-level only) ----
   const [openNav, setOpenNav] = React.useState(false);
   const [hideOnMobile, setHideOnMobile] = React.useState(false);
-  const [openBooks, setOpenBooks] = React.useState(false); // desktop Books
-  const [openStandalones, setOpenStandalones] = React.useState(false); // desktop nested
-  const [openMore, setOpenMore] = React.useState(false); // desktop More
+  const [atTop, setAtTop] = React.useState(true);
+
+  const [openBooks, setOpenBooks] = React.useState(false);
+  const [openStandalones, setOpenStandalones] = React.useState(false);
+  const [openMore, setOpenMore] = React.useState(false);
+  const [openShop, setOpenShop] = React.useState(false);
 
   const [navSettings, setNavSettings] = React.useState<NavSettings | null>(null);
   const [series, setSeries] = React.useState<BookLinkItem[]>([]);
   const [standalones, setStandalones] = React.useState<BookLinkItem[]>([]);
+
   const location = useLocation();
 
-  // Hardcoded order
+  // Hardcoded top-level links (before Books)
   const mainLinks = [
     { label: 'Home', href: '/' },
     { label: 'About', href: '/about' },
   ];
-  // Sanity Handled Books page is rendered in between these links on site
-  /* const afterBooksLinks = [
-    { label: "Trigger Warnings", href: "/trigger-warnings" },
-    { label: "Contact", href: "/contact" },
-  ]; */
 
+  // Active helpers
+  const isBooksSection =
+    location.pathname.startsWith('/books') || location.pathname.startsWith('/series');
+  const isActive = (href: string) => location.pathname === href;
+
+  const topLinkClasses = (active: boolean) =>
+    [navLinkBase, active ? 'text-navAccent font-semibold' : 'text-nav hover:text-navHover'].join(
+      ' ',
+    );
+
+  // Load navigation + series data from Sanity
   React.useEffect(() => {
     const query = `
     {
-      "settings": *[_type == "navigation" && _id == "singleton-navigation"][0]{ storeLink, moreLinks },
+      "settings": *[_type == "navigation" && _id == "singleton-navigation"][0]{
+        storeLink, shopLinks, moreLinks
+      },
       "series": *[_type == "series"] | order(title asc){
         "type": "series", "label": title, "slug": slug.current
       },
@@ -66,6 +100,7 @@ export default function Navbar() {
       if (window.innerWidth >= 1024) setOpenNav(false);
     };
     window.addEventListener('resize', onResize);
+
     return () => {
       cancelled = true;
       window.removeEventListener('resize', onResize);
@@ -84,12 +119,14 @@ export default function Navbar() {
       if (!el.closest('[data-popover=books]')) setOpenBooks(false);
       if (!el.closest('[data-popover=standalones]')) setOpenStandalones(false);
       if (!el.closest('[data-popover=more]')) setOpenMore(false);
+      if (!el.closest('[data-popover=shop]')) setOpenShop(false);
     };
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         setOpenBooks(false);
         setOpenStandalones(false);
         setOpenMore(false);
+        setOpenShop(false);
       }
     };
     document.addEventListener('click', onClick);
@@ -100,7 +137,7 @@ export default function Navbar() {
     };
   }, []);
 
-  // Auto-hide on mobile: scroll down = hide, scroll up/top = show
+  // Auto-hide on mobile (down = hide, up/top = show)
   React.useEffect(() => {
     let lastY = window.scrollY;
     let ticking = false;
@@ -110,16 +147,13 @@ export default function Navbar() {
       ticking = true;
       requestAnimationFrame(() => {
         const y = window.scrollY;
-        const isMobile = window.innerWidth < 1024; // lg breakpoint
+        const isMobile = window.innerWidth < 1024;
 
         if (isMobile && !openNav) {
-          const goingDown = y > lastY && y > 10; // small threshold to ignore micro scroll
+          const goingDown = y > lastY && y > 10;
           const nearTop = y < 4;
-
-          if (nearTop) setHideOnMobile(false);
-          else setHideOnMobile(goingDown);
+          setHideOnMobile(nearTop ? false : goingDown);
         } else {
-          // Always show on desktop or when menu is open
           setHideOnMobile(false);
         }
 
@@ -132,38 +166,70 @@ export default function Navbar() {
 
     window.addEventListener('scroll', onScroll, { passive: true });
     window.addEventListener('resize', onResize);
-
     return () => {
       window.removeEventListener('scroll', onScroll);
       window.removeEventListener('resize', onResize);
     };
-  }, [openNav, setHideOnMobile]);
+  }, [openNav]);
+
+  // Shadow in/out at top
+  React.useEffect(() => {
+    const onScroll = () => setAtTop(window.scrollY < 4);
+    onScroll(); // initialize
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
+  // Lock body scroll on mobile when menu open
+  React.useEffect(() => {
+    const isMobile = () => window.innerWidth < 1024;
+
+    if (openNav && isMobile()) {
+      const prev = document.body.style.overflow;
+      document.body.style.overflow = 'hidden';
+      return () => {
+        document.body.style.overflow = prev;
+      };
+    }
+
+    const onResize = () => {
+      if (!isMobile()) document.body.style.overflow = '';
+    };
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, [openNav]);
+
+  // Shop logic
+  const shopArr = navSettings?.shopLinks ?? [];
+  const hasSingleShopOnly = !!navSettings?.storeLink && shopArr.length === 0;
+  const hasShopMenu = (navSettings?.storeLink?.url ? 1 : 0) + shopArr.length > 1;
 
   return (
     <nav
+      role="navigation"
       data-navbar-root
+      aria-label="Main"
       className={[
-        'fixed top-0 z-50 w-full border-b border-gray-200 bg-white/70 backdrop-blur-md shadow-sm',
-        'dark:border-gray-800 dark:bg-gray-900/70',
-        'transition-transform duration-300 will-change-transform',
+        'fixed top-0 z-50 w-full backdrop-blur-md',
+        atTop ? 'bg-nav-bg/80' : 'bg-nav-bg/90',
+        'border-b border-transparent',
+        'motion-soft will-change-transform',
+        atTop ? 'shadow-none' : 'shadow-md',
         hideOnMobile ? '-translate-y-full lg:translate-y-0' : 'translate-y-0',
       ].join(' ')}
     >
-      <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-2 lg:px-8">
+      <div className="mx-auto flex max-w-7xl items-center justify-between px-4 lg:px-8">
         {/* Brand */}
-        <Link to="/" className="py-1.5 text-base font-semibold text-gray-900 dark:text-white">
+        <Link to="/" className="py-1.5 text-base font-semibold text-navHover hover:text-navAccent">
           Beronika Keres
         </Link>
 
         {/* Desktop nav */}
-        <ul className="hidden items-center gap-6 lg:flex">
+        <ul className="hidden items-center lg:flex">
           {/* Home / About */}
           {mainLinks.map(({ label, href }) => (
             <li key={label}>
-              <Link
-                className="p-1 text-sm text-gray-800 hover:text-gray-900 dark:text-gray-100 dark:hover:text-white"
-                to={href}
-              >
+              <Link className={topLinkClasses(isActive(href))} to={href}>
                 {label}
               </Link>
             </li>
@@ -173,40 +239,33 @@ export default function Navbar() {
           <li className="relative" data-popover="books">
             <button
               type="button"
-              className="flex items-center gap-1 p-1 text-sm text-gray-800 hover:text-gray-900 dark:text-gray-100 dark:hover:text-white"
+              className={[navLinkBase, isBooksSection ? 'text-navAccent font-semibold' : ''].join(
+                ' ',
+              )}
               aria-expanded={openBooks}
+              aria-controls="menu-books"
               onClick={(e) => {
                 e.stopPropagation();
                 setOpenBooks((v) => !v);
                 setOpenMore(false);
+                setOpenShop(false);
               }}
             >
               Books
-              <svg
-                className={`h-4 w-4 transition ${openBooks ? 'rotate-180' : ''}`}
-                viewBox="0 0 20 20"
-                fill="currentColor"
-              >
+              <svg className={chevronClass} viewBox="0 0 20 20" fill="currentColor">
                 <path d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.08 1.04l-4.25 4.25a.75.75 0 01-1.06 0L5.21 8.27a.75.75 0 01.02-1.06z" />
               </svg>
             </button>
 
             {openBooks && (
-              <div
-                role="menu"
-                className="absolute left-0 top-full z-20 mt-2 min-w-[16rem] rounded-lg border border-gray-200 bg-white p-1 shadow-lg dark:border-gray-700 dark:bg-gray-800"
-              >
-                <Link
-                  role="menuitem"
-                  className="block rounded px-3 py-2 text-sm hover:bg-gray-50 dark:hover:bg-gray-700"
-                  to="/books"
-                >
+              <div id="menu-books" role="menu" className={panelClass}>
+                <Link role="menuitem" className={itemClass} to="/books">
                   All Books
                 </Link>
 
                 {series.length > 0 && (
                   <>
-                    <div className="px-3 pt-2 pb-1 text-xs font-semibold uppercase text-gray-500 dark:text-gray-400">
+                    <div className="px-4 pt-2 pb-1 text-xs font-semibold uppercase text-white/60">
                       Series
                     </div>
                     {series.map(({ label, slug }) => (
@@ -214,7 +273,7 @@ export default function Navbar() {
                         key={`series-${slug}`}
                         role="menuitem"
                         to={`/series/${slug}`}
-                        className="block rounded px-3 py-2 text-sm hover:bg-gray-50 dark:hover:bg-gray-700"
+                        className={itemClass}
                       >
                         {label}
                       </Link>
@@ -226,8 +285,9 @@ export default function Navbar() {
                   <div className="relative mt-1" data-popover="standalones">
                     <button
                       type="button"
-                      className="flex w-full items-center justify-between rounded px-3 py-2 text-sm hover:bg-gray-50 dark:hover:bg-gray-700"
+                      className="flex w-full items-center justify-between rounded px-4 py-2 text-sm text-nav hover:text-navHover hover:bg-white/5"
                       aria-expanded={openStandalones}
+                      aria-controls="menu-standalones"
                       onClick={(e) => {
                         e.stopPropagation();
                         setOpenStandalones((v) => !v);
@@ -235,7 +295,7 @@ export default function Navbar() {
                     >
                       Standalones
                       <svg
-                        className={`h-4 w-4 transition ${openStandalones ? 'rotate-90' : ''}`}
+                        className="h-4 w-4 opacity-80 motion-safe:transition motion-reduce:transition-none"
                         viewBox="0 0 20 20"
                         fill="currentColor"
                       >
@@ -245,15 +305,16 @@ export default function Navbar() {
 
                     {openStandalones && (
                       <div
+                        id="menu-standalones"
                         role="menu"
-                        className="absolute left-full top-0 z-30 ml-2 min-w-[14rem] rounded-lg border border-gray-200 bg-white p-1 shadow-lg dark:border-gray-700 dark:bg-gray-800"
+                        className="absolute left-full top-0 z-30 ml-2 min-w-[14rem] rounded-lg bg-nav-bg/95 text-navHover p-1 shadow-lg backdrop-blur border-0 motion-fade-in"
                       >
                         {standalones.map(({ label, slug }) => (
                           <Link
                             key={`standalone-${slug}`}
                             role="menuitem"
                             to={`/books/${slug}`}
-                            className="block rounded px-3 py-2 text-sm hover:bg-gray-50 dark:hover:bg-gray-700"
+                            className={itemClass}
                           >
                             {label}
                           </Link>
@@ -268,60 +329,106 @@ export default function Navbar() {
 
           {/* Trigger Warnings */}
           <li>
-            <Link
-              className="p-1 text-sm text-gray-800 hover:text-gray-900 dark:text-gray-100 dark:hover:text-white"
-              to="/trigger-warnings"
-            >
+            <Link className={topLinkClasses(isActive('/trigger-warnings'))} to="/trigger-warnings">
               Trigger Warnings
             </Link>
           </li>
 
-          {/* More (store + moreLinks) */}
-          {(navSettings?.storeLink?.url || (navSettings?.moreLinks?.length ?? 0) > 0) && (
+          {/* Shop (single link OR dropdown if multiple) */}
+          {hasSingleShopOnly ? (
+            <li>
+              <a
+                href={navSettings?.storeLink?.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={navLinkBase}
+              >
+                {navSettings?.storeLink?.label || 'Shop'}
+              </a>
+            </li>
+          ) : (
+            (hasShopMenu || shopArr.length > 0) && (
+              <li className="relative" data-popover="shop">
+                <button
+                  type="button"
+                  className={navLinkBase}
+                  aria-expanded={openShop}
+                  aria-controls="menu-shop"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setOpenShop((v) => !v);
+                    setOpenBooks(false);
+                    setOpenStandalones(false);
+                    setOpenMore(false);
+                  }}
+                >
+                  Shop
+                  <svg className={chevronClass} viewBox="0 0 20 20" fill="currentColor">
+                    <path d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.08 1.04l-4.25 4.25a.75.75 0 01-1.06 0L5.21 8.27a.75.75 0 01.02-1.06z" />
+                  </svg>
+                </button>
+
+                {openShop && (
+                  <div id="menu-shop" role="menu" className={panelClass}>
+                    {navSettings?.storeLink?.url && (
+                      <a
+                        role="menuitem"
+                        className={itemClass}
+                        href={navSettings.storeLink.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        {navSettings.storeLink.label || 'Shop'}
+                      </a>
+                    )}
+                    {shopArr.map(({ label, url }) => (
+                      <a
+                        key={`shop-${label}`}
+                        role="menuitem"
+                        className={itemClass}
+                        href={url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        {label}
+                      </a>
+                    ))}
+                  </div>
+                )}
+              </li>
+            )
+          )}
+
+          {/* More (extra links) */}
+          {(navSettings?.moreLinks?.length ?? 0) > 0 && (
             <li className="relative" data-popover="more">
               <button
                 type="button"
-                className="flex items-center gap-1 p-1 text-sm text-gray-800 hover:text-gray-900 dark:text-gray-100 dark:hover:text-white"
+                className={navLinkBase}
                 aria-expanded={openMore}
+                aria-controls="menu-more"
                 onClick={(e) => {
                   e.stopPropagation();
                   setOpenMore((v) => !v);
                   setOpenBooks(false);
                   setOpenStandalones(false);
+                  setOpenShop(false);
                 }}
               >
                 More
-                <svg
-                  className={`h-4 w-4 transition ${openMore ? 'rotate-180' : ''}`}
-                  viewBox="0 0 20 20"
-                  fill="currentColor"
-                >
+                <svg className={chevronClass} viewBox="0 0 20 20" fill="currentColor">
                   <path d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.08 1.04l-4.25 4.25a.75.75 0 01-1.06 0L5.21 8.27a.75.75 0 01.02-1.06z" />
                 </svg>
               </button>
 
               {openMore && (
-                <div
-                  role="menu"
-                  className="absolute left-0 top-full z-20 mt-2 min-w-[14rem] rounded-lg border border-gray-200 bg-white p-1 shadow-lg dark:border-gray-700 dark:bg-gray-800"
-                >
-                  {navSettings?.storeLink?.url && (
-                    <a
-                      role="menuitem"
-                      className="block rounded px-3 py-2 text-sm hover:bg-gray-50 dark:hover:bg-gray-700"
-                      href={navSettings.storeLink.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      {navSettings.storeLink.label || 'Store'}
-                    </a>
-                  )}
+                <div id="menu-more" role="menu" className={panelClass}>
                   {(navSettings?.moreLinks ?? []).map(({ label, url }) =>
                     isExternal(url) ? (
                       <a
                         key={`more-${label}`}
                         role="menuitem"
-                        className="block rounded px-3 py-2 text-sm hover:bg-gray-50 dark:hover:bg-gray-700"
+                        className={itemClass}
                         href={url}
                         target="_blank"
                         rel="noopener noreferrer"
@@ -329,12 +436,7 @@ export default function Navbar() {
                         {label}
                       </a>
                     ) : (
-                      <Link
-                        key={`more-${label}`}
-                        role="menuitem"
-                        className="block rounded px-3 py-2 text-sm hover:bg-gray-50 dark:hover:bg-gray-700"
-                        to={url}
-                      >
+                      <Link key={`more-${label}`} role="menuitem" className={itemClass} to={url}>
                         {label}
                       </Link>
                     ),
@@ -346,10 +448,7 @@ export default function Navbar() {
 
           {/* Contact */}
           <li>
-            <Link
-              className="p-1 text-sm text-gray-800 hover:text-gray-900 dark:text-gray-100 dark:hover:text-white"
-              to="/contact"
-            >
+            <Link className={topLinkClasses(isActive('/contact'))} to="/contact">
               Contact
             </Link>
           </li>
@@ -361,7 +460,7 @@ export default function Navbar() {
           aria-label="Toggle navigation"
           aria-expanded={openNav}
           onClick={() => setOpenNav((v) => !v)}
-          className="ml-auto h-6 w-6 text-gray-900 dark:text-gray-100 lg:hidden"
+          className="ml-auto h-6 w-6 text-navHover lg:hidden"
         >
           {openNav ? (
             <svg
@@ -397,7 +496,11 @@ export default function Navbar() {
                 key={label}
                 to={href}
                 onClick={() => setOpenNav(false)}
-                className="py-2 text-sm text-gray-800 dark:text-gray-100"
+                className={[
+                  'py-2 text-sm',
+                  isActive(href) ? 'font-semibold text-navAccent' : 'text-nav hover:text-navHover',
+                ].join(' ')}
+                aria-current={isActive(href) ? 'page' : undefined}
               >
                 {label}
               </Link>
@@ -405,10 +508,10 @@ export default function Navbar() {
 
             {/* Books accordion */}
             <details className="group">
-              <summary className="flex cursor-pointer list-none items-center justify-between py-2 text-sm text-gray-800 dark:text-gray-100">
+              <summary className="flex cursor-pointer list-none items-center justify-between py-2 text-sm text-nav">
                 <span>Books</span>
                 <svg
-                  className="h-4 w-4 transition group-open:rotate-180"
+                  className="h-4 w-4 opacity-80 motion-safe:transition motion-reduce:transition-none"
                   viewBox="0 0 20 20"
                   fill="currentColor"
                 >
@@ -416,13 +519,17 @@ export default function Navbar() {
                 </svg>
               </summary>
               <div className="ml-3 flex flex-col">
-                <Link to="/books" onClick={() => setOpenNav(false)} className="py-2 text-sm">
+                <Link
+                  to="/books"
+                  onClick={() => setOpenNav(false)}
+                  className="py-2 text-sm text-nav hover:text-navHover"
+                >
                   All Books
                 </Link>
 
                 {series.length > 0 && (
                   <>
-                    <div className="pt-1 pb-1 text-xs font-semibold uppercase text-gray-500 dark:text-gray-400">
+                    <div className="pt-1 pb-1 text-xs font-semibold uppercase text-white/60">
                       Series
                     </div>
                     {series.map(({ label, slug }) => (
@@ -430,7 +537,7 @@ export default function Navbar() {
                         key={`m-series-${slug}`}
                         to={`/series/${slug}`}
                         onClick={() => setOpenNav(false)}
-                        className="py-2 text-sm"
+                        className="py-2 text-sm text-nav hover:text-navHover"
                       >
                         {label}
                       </Link>
@@ -440,10 +547,10 @@ export default function Navbar() {
 
                 {standalones.length > 0 && (
                   <details className="group">
-                    <summary className="flex cursor-pointer list-none items-center justify-between py-2 text-sm">
+                    <summary className="flex cursor-pointer list-none items-center justify-between py-2 text-sm text-nav">
                       <span>Standalones</span>
                       <svg
-                        className="h-4 w-4 transition group-open:rotate-180"
+                        className="h-4 w-4 motion-safe:transition motion-reduce:transition-none group-open:rotate-180 opacity-80"
                         viewBox="0 0 20 20"
                         fill="currentColor"
                       >
@@ -456,7 +563,7 @@ export default function Navbar() {
                           key={`m-standalone-${slug}`}
                           to={`/books/${slug}`}
                           onClick={() => setOpenNav(false)}
-                          className="py-2 text-sm"
+                          className="py-2 text-sm text-nav hover:text-navHover"
                         >
                           {label}
                         </Link>
@@ -467,16 +574,81 @@ export default function Navbar() {
               </div>
             </details>
 
-            <Link to="/trigger-warnings" onClick={() => setOpenNav(false)} className="py-2 text-sm">
+            {/* Trigger Warnings */}
+            <Link
+              to="/trigger-warnings"
+              onClick={() => setOpenNav(false)}
+              className={[
+                'py-2 text-sm',
+                isActive('/trigger-warnings')
+                  ? 'font-semibold text-navAccent'
+                  : 'text-nav hover:text-navHover',
+              ].join(' ')}
+              aria-current={isActive('/trigger-warnings') ? 'page' : undefined}
+            >
               Trigger Warnings
             </Link>
 
-            {(navSettings?.storeLink?.url || (navSettings?.moreLinks?.length ?? 0) > 0) && (
+            {/* Shop (single or many) */}
+            {hasSingleShopOnly ? (
+              <a
+                href={navSettings?.storeLink?.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="py-2 text-sm text-nav hover:text-navHover"
+                onClick={() => setOpenNav(false)}
+              >
+                {navSettings?.storeLink?.label || 'Shop'}
+              </a>
+            ) : (
+              (hasShopMenu || shopArr.length > 0) && (
+                <details className="group">
+                  <summary className="flex cursor-pointer list-none items-center justify-between py-2 text-sm text-nav">
+                    <span>Shop</span>
+                    <svg
+                      className="h-4 w-4 motion-safe:transition motion-reduce:transition-none group-open:rotate-180 opacity-80"
+                      viewBox="0 0 20 20"
+                      fill="currentColor"
+                    >
+                      <path d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.08 1.04l-4.25 4.25a.75.75 0 01-1.06 0L5.21 8.27a.75.75 0 01.02-1.06z" />
+                    </svg>
+                  </summary>
+                  <div className="ml-3 flex flex-col">
+                    {navSettings?.storeLink?.url && (
+                      <a
+                        href={navSettings.storeLink.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="py-2 text-sm text-nav hover:text-navHover"
+                        onClick={() => setOpenNav(false)}
+                      >
+                        {navSettings.storeLink.label || 'Shop'}
+                      </a>
+                    )}
+                    {shopArr.map(({ label, url }) => (
+                      <a
+                        key={`m-shop-${label}`}
+                        href={url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="py-2 text-sm text-nav hover:text-navHover"
+                        onClick={() => setOpenNav(false)}
+                      >
+                        {label}
+                      </a>
+                    ))}
+                  </div>
+                </details>
+              )
+            )}
+
+            {/* More */}
+            {(navSettings?.moreLinks?.length ?? 0) > 0 && (
               <details className="group">
-                <summary className="flex cursor-pointer list-none items-center justify-between py-2 text-sm">
+                <summary className="flex cursor-pointer list-none items-center justify-between py-2 text-sm text-nav">
                   <span>More</span>
                   <svg
-                    className="h-4 w-4 transition group-open:rotate-180"
+                    className="h-4 w-4 motion-safe:transition motion-reduce:transition-none group-open:rotate-180 opacity-80"
                     viewBox="0 0 20 20"
                     fill="currentColor"
                   >
@@ -484,17 +656,6 @@ export default function Navbar() {
                   </svg>
                 </summary>
                 <div className="ml-3 flex flex-col">
-                  {navSettings?.storeLink?.url && (
-                    <a
-                      href={navSettings.storeLink.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="py-2 text-sm"
-                      onClick={() => setOpenNav(false)}
-                    >
-                      {navSettings.storeLink.label || 'Store'}
-                    </a>
-                  )}
                   {(navSettings?.moreLinks ?? []).map(({ label, url }) =>
                     isExternal(url) ? (
                       <a
@@ -502,7 +663,7 @@ export default function Navbar() {
                         href={url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="py-2 text-sm"
+                        className="py-2 text-sm text-nav hover:text-navHover"
                         onClick={() => setOpenNav(false)}
                       >
                         {label}
@@ -511,7 +672,7 @@ export default function Navbar() {
                       <Link
                         key={`m-more-${label}`}
                         to={url}
-                        className="py-2 text-sm"
+                        className="py-2 text-sm text-nav hover:text-navHover"
                         onClick={() => setOpenNav(false)}
                       >
                         {label}
@@ -522,7 +683,18 @@ export default function Navbar() {
               </details>
             )}
 
-            <Link to="/contact" onClick={() => setOpenNav(false)} className="py-2 text-sm">
+            {/* Contact */}
+            <Link
+              to="/contact"
+              onClick={() => setOpenNav(false)}
+              className={[
+                'py-2 text-sm',
+                isActive('/contact')
+                  ? 'font-semibold text-navAccent'
+                  : 'text-nav hover:text-navHover',
+              ].join(' ')}
+              aria-current={isActive('/contact') ? 'page' : undefined}
+            >
               Contact
             </Link>
           </div>

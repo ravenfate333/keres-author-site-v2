@@ -1,0 +1,21 @@
+/* Base tokens – light theme */
+:root {
+    /* Brand in HSL */
+    --brand: 0 100% 17.8%; /* Deep red */
+  
+    /* Nav tokens */
+    --nav-bg: var(--brand);           /* navbar & dropdown background */
+    --nav-text: 0 0% 100% / 0.92;     /* off‑white */
+    --nav-text-hover: 0 0% 100%;      /* white */
+    --nav-accent: var(--brand);       /* active/brand accents */
+    --nav-height: 3.5rem; /* ~56px; */
+  }
+  
+  /* Optional dark mode overrides */
+  :root.dark {
+    /* Shift hue/lightness for dark mode */
+    --nav-bg: var(--brand);
+    --nav-text: 0 0% 100% / 0.92;
+    --nav-text-hover: 0 0% 100%;
+  }
+  

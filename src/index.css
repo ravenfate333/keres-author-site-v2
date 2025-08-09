@@ -1,15 +1,35 @@
+@import './styles/tokens.css';
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
-    html {
-      @apply overflow-y-scroll;
-      scrollbar-gutter: stable;
-    }
-    
-    body {
-      @apply bg-black bg-fixed bg-cover;
-      background-image: url('/Background.webp');
-    }
+  html {
+    /*@apply overflow-y-scroll;
+     scrollbar-gutter: stable; */
   }
+
+  body {
+    @apply bg-black bg-fixed bg-cover;
+    background-image: url('/Background.webp');
+  }
+}
+
+@layer utilities {
+  /* General-purpose soft transition */
+  .motion-soft {
+    @apply motion-safe:transition motion-safe:duration-300 motion-safe:ease-out motion-reduce:transition-none;
+  }
+
+  /* For things that scale slightly on hover (cards, buttons) */
+  .motion-pop {
+    @apply motion-safe:transition motion-safe:duration-300 motion-safe:ease-out motion-safe:hover:scale-[1.02]
+           motion-reduce:transition-none motion-reduce:transform-none;
+  }
+
+  /* Fade-in helper (needs keyframes below) */
+  .motion-fade-in {
+    @apply motion-safe:animate-fade-in motion-reduce:animate-none;
+  }
+}
+
