@@ -18,7 +18,8 @@ export default function MoreMenu({ links = [], openOnHover = false }: Props) {
       <Dropdown label="More" buttonClassName={navLinkBase} openOnHover={openOnHover}>
         {hasAny ? (
           list.map((l, i) => (
-            <a key={`${l.url}-${i}`} role="menuitem" className={itemClass} href={l.url}>
+            <a key={`${l.url}-${i}`} role="menuitem" className={itemClass} href={l.url} target="_blank"
+            rel="noopener noreferrer">
               {l.label}
             </a>
           ))
