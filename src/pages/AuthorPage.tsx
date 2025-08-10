@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 import sanityClient, { urlFor } from '../sanityClient';
 import { PortableText } from '@portabletext/react';
 import { customPortableTextComponents } from '../utils/portableTextComponents';
+import GhostPeeker from '../components/FunAnimations/GhostPeeker';
+import BottomGhost from '../components/FunAnimations/BottomGhost';
 
 interface AuthorData {
   author: string;
@@ -66,6 +68,10 @@ const AuthorPage = () => {
           </div>
         </div>
       </div>
+
+      {/* Fun Ghosts */}
+      <GhostPeeker edge="right" />
+      <BottomGhost ghostWidthPx={50} bottomOffsetPx={18} speedPxPerSec={56} face="alternate" />
     </div>
   );
 };
