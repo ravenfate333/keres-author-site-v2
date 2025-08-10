@@ -8,7 +8,6 @@
     @apply overflow-y-scroll;
     scrollbar-gutter: stable;
   }
-
   body {
     @apply bg-black bg-fixed bg-cover;
     background-image: url('/Background.webp');
@@ -21,8 +20,7 @@
     @apply motion-safe:transition motion-safe:duration-300 motion-safe:ease-out motion-reduce:transition-none;
   }
   .motion-pop {
-    @apply motion-safe:transition motion-safe:duration-300 motion-safe:ease-out motion-safe:hover:scale-[1.02]
-           motion-reduce:transition-none motion-reduce:transform-none;
+    @apply motion-safe:transition motion-safe:duration-300 motion-safe:ease-out motion-safe:hover:scale-[1.02] motion-reduce:transition-none motion-reduce:transform-none;
   }
   .motion-fade-in {
     @apply motion-safe:animate-fade-in motion-reduce:animate-none;
@@ -33,44 +31,64 @@
 
   /* ---------- Keyframes ---------- */
   @keyframes ghost-peek {
-    0%, 100% { transform: translateX(var(--startX)); opacity: 0; }
-    10%, 90% { opacity: 1; }
-    50% { transform: translateX(0); opacity: 1; }
+    0%,
+    100% {
+      transform: translateX(var(--startX));
+      opacity: 0;
+    }
+    10%,
+    90% {
+      opacity: 1;
+    }
+    50% {
+      transform: translateX(0);
+      opacity: 1;
+    }
   }
   @keyframes ghost-bob {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-4px); }
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-4px);
+    }
   }
   @keyframes ghost-sneak-bob {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-3px); }
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-3px);
+    }
   }
   @keyframes fade-in {
-    from { opacity: 0; }
-    to { opacity: 1; }
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
   }
   @keyframes ghost-shiver {
-    0%, 100% { transform: translateX(0); }
-    50% { transform: translateX(2px); }
+    0%,
+    100% {
+      transform: translateX(0);
+    }
+    50% {
+      transform: translateX(2px);
+    }
   }
 
   /* ---------- Animations ---------- */
   .animate-ghost-peek {
     animation: ghost-peek var(--peekDuration, 4.2s) ease-in-out forwards,
-               ghost-bob 2s ease-in-out infinite;
+      ghost-bob 2s ease-in-out infinite;
     will-change: transform, opacity;
   }
   .animate-ghost-sneak-bob {
     animation: ghost-sneak-bob 1.8s ease-in-out infinite;
-  }
-
-  /* ---------- SVG Safety ---------- */
-  @layer components {
-    svg[aria-label='sneaky ghost'] {
-      width: auto !important;
-      height: auto;
-      display: block;
-    }
   }
 
   /* ---------- Reduced Motion ---------- */
@@ -78,6 +96,17 @@
     .animate-ghost-peek {
       animation: ghost-peek var(--peekDuration, 2s) ease-in-out forwards;
     }
+    .animate-ghost-sneak-bob {
+      animation: none;
+    } /* stop bottom bobbing */
   }
 }
 
+/* ---------- SVG Safety (top-level components layer) ---------- */
+@layer components {
+  svg[aria-label='sneaky ghost'] {
+    width: auto !important;
+    height: auto;
+    display: block;
+  }
+}

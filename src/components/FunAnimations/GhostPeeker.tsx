@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
+import GhostSprite from './GhostSprite';
 
 type Edge = 'left' | 'right';
 
@@ -9,7 +10,7 @@ interface GhostPeekerProps {
   maxDelayMs?: number;
   className?: string;
   zIndex?: number;
-  maxWidthPx?: number;
+  maxWidthPx?: number;         // cap the sprite width
   afraidRadiusPx?: number;     // mouse proximity that makes ghost hide
 }
 
@@ -77,7 +78,6 @@ export default function GhostPeeker({
   };
 
   useEffect(() => {
-    // run only while tab is visible
     const onVisibility = () => {
       clearTimers();
       if (document.visibilityState === 'visible') schedule();
@@ -109,6 +109,11 @@ export default function GhostPeeker({
   const isRight = edgeState === 'right';
   const sideClass = isRight ? 'right-0' : 'left-0';
   const startX = isRight ? '100%' : '-100%';
+
+  // size: match old behavior (responsive cap)
+  const spriteSize = Math.min(maxWidthPx, 0.12 * (typeof window !== 'undefined' ? window.innerWidth : 480));
+  // flip by mirroring the sprite horizontally
+  const flipStyle = { transform: isRight ? 'scaleX(1)' : 'scaleX(-1)' } as React.CSSProperties;
 
   return (
     <div
@@ -151,57 +156,15 @@ export default function GhostPeeker({
             </div>
           )}
 
-          {isSurprised ? (
-            <GhostSVGSurprised maxWidthPx={maxWidthPx} flip={isRight} />
-          ) : (
-            <GhostSVG maxWidthPx={maxWidthPx} flip={isRight} />
-          )}
+          {/* Shared sprite (face swaps), flip via scaleX */}
+          <div style={flipStyle}>
+            <GhostSprite
+              width={spriteSize}
+              face={isSurprised ? 'alternate' : 'normal'}
+            />
+          </div>
         </div>
       </div>
     </div>
-  );
-}
-
-function GhostSVG({ maxWidthPx, flip }: { maxWidthPx: number; flip: boolean }) {
-  return (
-    <svg
-      viewBox="0 0 64 64"
-      role="img"
-      aria-label="decorative ghost"
-      style={{
-        maxWidth: `${maxWidthPx}px`,
-        width: '12vw',
-        minWidth: '34px',
-        transform: flip ? 'scaleX(1)' : 'scaleX(-1)',
-        filter: 'drop-shadow(0 2px 6px rgba(0,0,0,0.25))',
-      }}
-    >
-      <path d="M32 6c-11 0-20 9-20 20v17c0 3 3 4 6 3 3-1 4 3 7 3s4-3 7-3 4 3 7 3 4-4 7-3c3 1 6 0 6-3V26C52 15 43 6 32 6z" fill="white" fillOpacity="0.9" />
-      <circle cx="24" cy="26" r="3.5" fill="black" />
-      <circle cx="40" cy="26" r="3.5" fill="black" />
-      <path d="M26 36c3 2 9 2 12 0" stroke="black" strokeWidth="2" fill="none" strokeLinecap="round" />
-    </svg>
-  );
-}
-
-function GhostSVGSurprised({ maxWidthPx, flip }: { maxWidthPx: number; flip: boolean }) {
-  return (
-    <svg
-      viewBox="0 0 64 64"
-      role="img"
-      aria-label="decorative ghost"
-      style={{
-        maxWidth: `${maxWidthPx}px`,
-        width: '12vw',
-        minWidth: '34px',
-        transform: flip ? 'scaleX(1)' : 'scaleX(-1)',
-        filter: 'drop-shadow(0 2px 6px rgba(0,0,0,0.25))',
-      }}
-    >
-      <path d="M32 6c-11 0-20 9-20 20v17c0 3 3 4 6 3 3-1 4 3 7 3s4-3 7-3 4 3 7 3 4-4 7-3c3 1 6 0 6-3V26C52 15 43 6 32 6z" fill="white" fillOpacity="0.9" />
-      <circle cx="24" cy="26" r="3.5" fill="black" />
-      <circle cx="40" cy="26" r="3.5" fill="black" />
-      <circle cx="32" cy="36" r="2.8" fill="black" />
-    </svg>
   );
 }

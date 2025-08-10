@@ -5,6 +5,7 @@ import { customPortableTextComponents } from '../utils/portableTextComponents';
 import GhostPeeker from '../components/FunAnimations/GhostPeeker';
 import BottomGhost from '../components/FunAnimations/BottomGhost';
 
+
 interface AuthorData {
   author: string;
   bio: any;
