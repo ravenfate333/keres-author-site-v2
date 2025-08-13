@@ -1,8 +1,8 @@
-import { useEffect } from "react";
-import { Link } from "react-router-dom";
-import type { BookItem } from "./BooksMenu";
-import type { LinkItem as ShopLink } from "./ShopMenu";
-import type { LinkItem as MoreLink } from "./MoreMenu";
+import { useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import type { BookItem } from './BooksMenu';
+import type { LinkItem as ShopLink } from './ShopMenu';
+import type { LinkItem as MoreLink } from './MoreMenu';
 
 type Props = {
   open: boolean;
@@ -17,34 +17,28 @@ type Props = {
 };
 
 const itemClass =
-  "block rounded-lg px-3 py-2 text-nav hover:text-navHover hover:bg-white/10 focus:bg-white/15 focus:outline-none";
+  'block rounded-lg px-3 py-2 text-nav hover:text-navHover hover:bg-white/10 focus:bg-white/15 focus:outline-none';
 
-export default function MobileNav({
-  open,
-  onOpenChange,
-  series,
-  standalones,
-  settings,
-}: Props) {
+export default function MobileNav({ open, onOpenChange, series, standalones, settings }: Props) {
   // Lock/unlock background scroll when mobile menu is open
   useEffect(() => {
     const el = document.documentElement;
-    if (open) el.classList.add("overflow-hidden");
-    else el.classList.remove("overflow-hidden");
-    return () => el.classList.remove("overflow-hidden");
+    if (open) el.classList.add('overflow-hidden');
+    else el.classList.remove('overflow-hidden');
+    return () => el.classList.remove('overflow-hidden');
   }, [open]);
 
   return (
     <div
       id="mobile-nav"
-      data-state={open ? "open" : "closed"}
+      data-state={open ? 'open' : 'closed'}
       className={[
         // match desktop bar tokens
-        "lg:hidden border-t border-white/10 bg-nav-bg/70 text-nav backdrop-blur",
+        'lg:hidden border-t border-white/10 bg-nav-bg/70 text-nav backdrop-blur',
         // slide open/closed
-        "transition-[max-height,opacity] duration-200 ease-out overflow-hidden",
-        open ? "max-h-[80vh] opacity-100" : "max-h-0 opacity-0",
-      ].join(" ")}
+        'transition-[max-height,opacity] duration-200 ease-out overflow-hidden',
+        open ? 'max-h-[80vh] opacity-100' : 'max-h-0 opacity-0',
+      ].join(' ')}
     >
       <div className="px-4 py-3 space-y-1">
         {/* Author (singleton) */}
@@ -68,11 +62,7 @@ export default function MobileNav({
 
           <div className="ml-1 pl-2 space-y-1">
             {/* All Books */}
-            <Link
-              to="/books"
-              className={itemClass}
-              onClick={() => onOpenChange(false)}
-            >
+            <Link to="/books" className={itemClass} onClick={() => onOpenChange(false)}>
               All Books
             </Link>
 
@@ -119,6 +109,15 @@ export default function MobileNav({
           </div>
         </details>
 
+        {/* Content Warnings */}
+        <Link to="/content-warnings" className={itemClass} onClick={() => onOpenChange(false)}>
+          Content Warnings
+        </Link>
+
+        <Link to="/faq" className={itemClass} onClick={() => onOpenChange(false)}>
+          FAQ
+        </Link>
+
         {/* Shop */}
         {settings?.storeLink && !(settings?.shopLinks && settings.shopLinks.length > 0) ? (
           <a
@@ -128,7 +127,7 @@ export default function MobileNav({
             className={itemClass}
             onClick={() => onOpenChange(false)}
           >
-            {settings.storeLink.label || "Shop"}
+            {settings.storeLink.label || 'Shop'}
           </a>
         ) : (
           (settings?.shopLinks?.length || 0) > 0 && (
@@ -152,7 +151,7 @@ export default function MobileNav({
                     className={itemClass}
                     onClick={() => onOpenChange(false)}
                   >
-                    {settings.storeLink.label || "Shop"}
+                    {settings.storeLink.label || 'Shop'}
                   </a>
                 )}
                 {(settings?.shopLinks || []).map((l, i) => (

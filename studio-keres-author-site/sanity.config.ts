@@ -5,7 +5,7 @@ import {schemaTypes} from './schemaTypes'
 import {colorInput} from '@sanity/color-input'
 import {deskStructure} from './deskStructure'
 
-const singletonTypes = new Set(['navigation', 'author', 'settings', 'socialLinks']);
+const singletonTypes = new Set(['navigation', 'author', 'settings', 'socialLinks', 'accordionPage',]);
 const singletonActions = new Set(['publish', 'discardChanges', 'restore']);
 
 const newDocOptions: NewDocumentOptionsResolver = (prev, { creationContext }) => {

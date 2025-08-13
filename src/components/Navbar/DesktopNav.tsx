@@ -1,13 +1,13 @@
-import { Link, useLocation } from "react-router-dom";
-import BooksMenu from "./BooksMenu";
-import type { BookItem } from "./BooksMenu";
-import ShopMenu from "./ShopMenu";
-import type { LinkItem as ShopLink } from "./ShopMenu";
-import MoreMenu from "./MoreMenu";
-import type { LinkItem as MoreLink } from "./MoreMenu";
+import { Link, useLocation } from 'react-router-dom';
+import BooksMenu from './BooksMenu';
+import type { BookItem } from './BooksMenu';
+import ShopMenu from './ShopMenu';
+import type { LinkItem as ShopLink } from './ShopMenu';
+import MoreMenu from './MoreMenu';
+import type { LinkItem as MoreLink } from './MoreMenu';
 
 const navLinkBase =
-  "inline-flex items-center gap-1 px-3 py-2 rounded-lg text-nav hover:text-navHover focus:outline-none focus-visible:ring-2 focus-visible:ring-white/40";
+  'inline-flex items-center gap-1 px-3 py-2 rounded-lg text-nav hover:text-navHover focus:outline-none focus-visible:ring-2 focus-visible:ring-white/40';
 
 type Props = {
   series: BookItem[];
@@ -22,7 +22,7 @@ type Props = {
 
 export default function DesktopNav({ series, standalones, settings, isActive }: Props) {
   const { pathname } = useLocation();
-  const booksActive = pathname.startsWith("/books") || pathname.startsWith("/series");
+  const booksActive = pathname.startsWith('/books') || pathname.startsWith('/series');
 
   return (
     <ul className="hidden lg:flex ml-auto items-center gap-6">
@@ -30,8 +30,8 @@ export default function DesktopNav({ series, standalones, settings, isActive }: 
       <li className="list-none">
         <Link
           to="/"
-          className={[navLinkBase, isActive("/") ? "font-semibold text-navAccent" : ""].join(" ")}
-          aria-current={isActive("/") ? "page" : undefined}
+          className={[navLinkBase, isActive('/') ? 'font-semibold text-navAccent' : ''].join(' ')}
+          aria-current={isActive('/') ? 'page' : undefined}
         >
           Home
         </Link>
@@ -41,8 +41,10 @@ export default function DesktopNav({ series, standalones, settings, isActive }: 
       <li className="list-none">
         <Link
           to="/about"
-          className={[navLinkBase, isActive("/about") ? "font-semibold text-navAccent" : ""].join(" ")}
-          aria-current={isActive("/about") ? "page" : undefined}
+          className={[navLinkBase, isActive('/about') ? 'font-semibold text-navAccent' : ''].join(
+            ' ',
+          )}
+          aria-current={isActive('/about') ? 'page' : undefined}
         >
           Author
         </Link>
@@ -56,25 +58,46 @@ export default function DesktopNav({ series, standalones, settings, isActive }: 
         triggerActive={booksActive}
       />
 
+      {/* Content Warnings */}
+      <li className="list-none">
+        <Link
+          to="/content-warnings"
+          className={[
+            navLinkBase,
+            isActive('/content-warnings') ? 'font-semibold text-navAccent' : '',
+          ].join(' ')}
+          aria-current={isActive('/content-warnings') ? 'page' : undefined}
+        >
+          Content Warnings
+        </Link>
+      </li>
+
+      <li className="list-none">
+        <Link
+          to="/faq"
+          className={[navLinkBase, isActive('/faq') ? 'font-semibold text-navAccent' : ''].join(
+            ' ',
+          )}
+          aria-current={isActive('/faq') ? 'page' : undefined}
+        >
+          FAQ
+        </Link>
+      </li>
+
       {/* Shop (hover open) */}
-      <ShopMenu
-        storeLink={settings?.storeLink}
-        shopLinks={settings?.shopLinks || []}
-        openOnHover
-      />
+      <ShopMenu storeLink={settings?.storeLink} shopLinks={settings?.shopLinks || []} openOnHover />
 
       {/* More (hover open) */}
-      <MoreMenu
-        links={settings?.moreLinks || []}
-        openOnHover
-      />
+      <MoreMenu links={settings?.moreLinks || []} openOnHover />
 
       {/* Contact */}
       <li className="list-none">
         <Link
           to="/contact"
-          className={[navLinkBase, isActive("/contact") ? "font-semibold text-navAccent" : ""].join(" ")}
-          aria-current={isActive("/contact") ? "page" : undefined}
+          className={[navLinkBase, isActive('/contact') ? 'font-semibold text-navAccent' : ''].join(
+            ' ',
+          )}
+          aria-current={isActive('/contact') ? 'page' : undefined}
         >
           Contact
         </Link>

@@ -56,8 +56,8 @@ export default function GhostPeeker({
 
         if (randomEdge) setEdgeState(Math.random() < 0.5 ? 'left' : 'right');
 
-        // ~17% chance to show a quip
-        if (Math.random() < 0.17) {
+        // ~45% chance to show a quip
+        if (Math.random() < 0.45) {
           const q = QUIPS[rand(0, QUIPS.length - 1)];
           setQuip(q);
           window.setTimeout(() => setQuip(null), 1600);

@@ -12,6 +12,8 @@ import SeriesPage from './pages/SeriesPage';
 import BookPage from './pages/BookPage';
 import AuthorPage from './pages/AuthorPage';
 import AllBooksPage from './pages/AllBooksPage';
+import ContentWarningsPage from './pages/ContentWarningsPage';
+import FAQPage from './pages/FAQPage';
 // import ContactPage from './pages/ContactPage';
 
 const router = createBrowserRouter([
@@ -24,6 +26,8 @@ const router = createBrowserRouter([
       { path: 'books/:slug', element: <BookPage /> },
       { path: 'about', element: <AuthorPage /> },
       { path: 'books', element: <AllBooksPage /> },
+      { path: 'content-warnings', element: <ContentWarningsPage /> },
+      { path: 'FAQ', element: <FAQPage /> },
       // { path: 'contact', element: <ContactPage /> },
     ],
   },
@@ -32,5 +36,5 @@ const router = createBrowserRouter([
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <RouterProvider router={router} />
-  </React.StrictMode>
+  </React.StrictMode>,
 );

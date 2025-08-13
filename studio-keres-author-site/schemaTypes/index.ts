@@ -6,6 +6,7 @@ import navigation from './navigation'
 import author from './author'
 import settings from './settings'
 import links from './socialLinks'
+import accordionPage from './accordionPage'
 
 
-export const schemaTypes = [book, series, genre, navigation, author, settings, links]
+export const schemaTypes = [book, series, genre, navigation, author, settings, links, accordionPage]

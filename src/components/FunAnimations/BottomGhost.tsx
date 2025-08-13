@@ -23,19 +23,23 @@ interface BottomGhostProps {
 }
 
 const DEFAULT_QUIPS = [
-  'omw to buy books',
+  'omw to escape and buy books',
   "don't mind me...",
   'my TBR is scarier',
+  'I’ve read these books 107 times. Perks of immortality.',
   'I think this page is haunted...',
+  'Shh… don’t wake the vampire!',
+  'Day 384: still stuck on the bio page',
+  'Please tell Ber I want a bigger haunting radius.'
 ];
 const ONO = 'oh nooo...';
 
 export default function BottomGhost({
-  speedPxPerSec = 56,
+  speedPxPerSec = 50,
   bottomOffsetPx = 16,
   minPauseEveryMs = 2500,
   maxPauseEveryMs = 5200,
-  minPauseDurMs = 700,
+  minPauseDurMs = 1000,
   maxPauseDurMs = 1600,
   reentryDelayMs = 1200,
   zIndex = 90,

@@ -23,6 +23,21 @@ export const deskStructure = (S: StructureBuilder) =>
         .id('socialLinks')
         .child(S.document().schemaType('socialLinks').documentId('singleton-socialLinks')),
 
+      // --- Content Warning ---
+      S.listItem()
+        .title('Content Warnings')
+        .child(
+          S.editor()
+            .id('contentWarnings')
+            .schemaType('accordionPage')
+            .documentId('singleton-contentWarnings'),
+        ),
+
+      // --- FAQ ---
+      S.listItem()
+        .title('FAQ')
+        .child(S.editor().id('faq').schemaType('accordionPage').documentId('singleton-faq')),
+
       // --- Site Settings ---
       S.listItem()
         .title('Site Settings')
@@ -33,6 +48,7 @@ export const deskStructure = (S: StructureBuilder) =>
 
       // The rest of the documents
       ...S.documentTypeListItems().filter(
-        (listItem) => !['navigation', 'author', 'settings', 'socialLinks'].includes(listItem.getId()!),
+        (listItem) =>
+          !['navigation', 'author', 'settings', 'socialLinks', 'accordionPage'].includes(listItem.getId()!),
       ),
     ])
