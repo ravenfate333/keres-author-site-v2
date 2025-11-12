@@ -9,7 +9,7 @@ interface Props {
   anchorPrefix: "cw" | "faq";
   allowMultipleOpen?: boolean;
   portableTextComponents?: PortableTextComponents;
-  /** Optional user override to disable animation even if system allows motion */
+  /* Optional user override to disable animation even if system allows motion */
   disableAnimation?: boolean;
 }
 

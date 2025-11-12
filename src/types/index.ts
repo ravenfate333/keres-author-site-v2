@@ -19,6 +19,7 @@ export interface RgbaColor {
         url: string;
       };
     };
+    genres?: string[];
     blurb: any[];
     retailerButtons?: {
       _key: string;

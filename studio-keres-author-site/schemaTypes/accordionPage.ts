@@ -70,7 +70,7 @@ export default defineType({
           preview: {
             select: {title: 'title', slug: 'slug.current'},
             prepare: ({title, slug}) => ({
-              title: title || '<Untitled>',
+              //title: title || '<Untitled>',
               subtitle: slug ? `#${slug}` : 'No slug',
             }),
           },

@@ -1,4 +1,4 @@
-// This file defines a 'series' schema for Sanity.io for unique series objects to be created by the author/user. 
+// This file defines a 'series' schema for Sanity.io for unique series objects to be created by the author/user.
 import {defineField, defineType} from 'sanity'
 
 export default defineType({
@@ -13,16 +13,23 @@ export default defineType({
       type: 'string',
     }),
     defineField({
+      name: 'description',
+      title: 'Description',
+      type: 'array',
+      of: [{type: 'block'}], // Creates rich text editor for formatting
+    }),
+    defineField({
       name: 'genres',
       title: 'Series Genres',
       description: 'The main genres that apply to the entire series.',
       type: 'array',
-      of: [{type: 'reference', to: {type: 'genre'}}]
+      of: [{type: 'reference', to: {type: 'genre'}}],
     }),
     defineField({
       name: 'slug',
       title: 'URL Slug',
-      description: 'A unique, URL-friendly version of the title (e.g., cracked-coffins). Click "Generate".',
+      description:
+        'A unique, URL-friendly version of the title (e.g., cracked-coffins). Click "Generate".',
       type: 'slug',
       options: {
         source: 'title', // Auto-generates from the title field

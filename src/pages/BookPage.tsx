@@ -12,20 +12,21 @@ const BookPage = () => {
     if (!slug) return;
 
     const query = `*[_type == "book" && slug.current == $slug][0]{
-        ..., // Keep the spread operator to get all top-level fields
-        coverImage{
-          asset->{ // But explicitly "follow" the asset reference to get the URL
-            url
-          }
-        },
-        // Combined list of genres
-        "genres": (
-            coalesce(genres[]->, []) + coalesce(series->genres[]->, [])
-        )
+      ...,
+      coverImage{
+        asset->{ url }
+      },
+      // UNION: book genres + series genres -> titles (strings) + dedupe
+      "genres": array::unique(
+        coalesce(genres[]->title, []) +
+        coalesce(series->genres[]->title, [])
+      )
     }`;
+
     const params = { slug };
 
-    sanityClient.fetch(query, params)
+    sanityClient
+      .fetch(query, params)
       .then((data) => setBook(data))
       .catch(console.error);
   }, [slug]);
